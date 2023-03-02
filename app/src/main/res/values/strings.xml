@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GitApp</string>
+    <string name="user_login_label">USER LOGIN: </string>
+    <string name="user_id_label">USER ID: </string>
+</resources>
