@@ -6,4 +6,6 @@ interface UserRepository {
 
     fun loadData(callback:(List<UserEntity>) -> Unit)
 
+    fun getUser(login:String, callback: (UserEntity) -> Unit)
+
 }
