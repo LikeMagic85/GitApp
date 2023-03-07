@@ -13,7 +13,7 @@ class UserRepositoryImpl : UserRepository {
 
     private val mapper = Mapper()
 
-    override fun loadData(callback:(List<UserEntity>) -> Unit) {
+    override fun loadData(callback: (List<UserEntity>) -> Unit) {
         val tempList = mutableListOf<UserEntity>()
         ApiFactory.apiService.getUserList().enqueue(object : Callback<List<UserEntityDto>> {
             override fun onResponse(
@@ -29,6 +29,23 @@ class UserRepositoryImpl : UserRepository {
             }
 
             override fun onFailure(call: Call<List<UserEntityDto>>, t: Throwable) {
+                throw RuntimeException("Server error")
+            }
+
+        })
+    }
+
+    override fun getUser(login: String, callback: (UserEntity) -> Unit) {
+        ApiFactory.apiService.getUser(login).enqueue(object : Callback<UserEntityDto> {
+            override fun onResponse(call: Call<UserEntityDto>, response: Response<UserEntityDto>) {
+                if (response.isSuccessful) {
+                    response.body().let {
+                        callback.invoke(mapper.mapDtoToEntity(it!!))
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<UserEntityDto>, t: Throwable) {
                 throw RuntimeException("Server error")
             }
 
