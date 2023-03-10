@@ -5,12 +5,12 @@ import com.like_magic.gitapp.domain.usecases.GetUserUseCase
 import com.like_magic.gitapp.domain.usecases.LoadDataUseCase
 
 
-class Presenter:UsersContract.Presenter {
+class Presenter : UsersContract.Presenter {
 
     private val repository = UserRepositoryImpl()
     private val loadDataUseCase = LoadDataUseCase(repository)
     private val getUserUseCase = GetUserUseCase(repository)
-    private var view:UsersContract.View? = null
+    private var view: UsersContract.View? = null
     override fun attach(view: UsersContract.View) {
         this.view = view
     }
@@ -26,8 +26,8 @@ class Presenter:UsersContract.Presenter {
         }
     }
 
-    fun getUser(login:String){
-        getUserUseCase(login){
+    fun getUser(login: String) {
+        getUserUseCase(login) {
             view?.navigateToUserPage(it)
         }
     }

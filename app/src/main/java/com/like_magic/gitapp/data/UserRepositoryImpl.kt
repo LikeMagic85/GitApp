@@ -1,54 +1,45 @@
 package com.like_magic.gitapp.data
 
+import android.util.Log
 import com.like_magic.gitapp.domain.UserRepository
 import com.like_magic.gitapp.data.network.ApiFactory
-import com.like_magic.gitapp.domain.dto.UserEntityDto
 import com.like_magic.gitapp.domain.entity.UserEntity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 
 class UserRepositoryImpl : UserRepository {
 
     private val mapper = Mapper()
+    private val compositeDisposable = CompositeDisposable()
 
     override fun loadData(callback: (List<UserEntity>) -> Unit) {
-        val tempList = mutableListOf<UserEntity>()
-        ApiFactory.apiService.getUserList().enqueue(object : Callback<List<UserEntityDto>> {
-            override fun onResponse(
-                call: Call<List<UserEntityDto>>,
-                response: Response<List<UserEntityDto>>
-            ) {
-                if (response.isSuccessful) {
-                    response.body()?.map {
-                        tempList.add(mapper.mapDtoToEntity(it))
-                        callback.invoke(tempList)
-                    }
-                }
+        val disposable = ApiFactory.apiService.getUserList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .map{
+                mapper.mapListDtoToListEntity(it)
             }
-
-            override fun onFailure(call: Call<List<UserEntityDto>>, t: Throwable) {
-                throw RuntimeException("Server error")
-            }
-
-        })
+            .subscribe ({
+                callback.invoke(
+                    it
+                )
+            },{
+                Log.d("TEST_OF_LOADING_DATA", "Failure: ${it.message}")
+            })
+        compositeDisposable.add(disposable)
     }
 
     override fun getUser(login: String, callback: (UserEntity) -> Unit) {
-        ApiFactory.apiService.getUser(login).enqueue(object : Callback<UserEntityDto> {
-            override fun onResponse(call: Call<UserEntityDto>, response: Response<UserEntityDto>) {
-                if (response.isSuccessful) {
-                    response.body().let {
-                        callback.invoke(mapper.mapDtoToEntity(it!!))
-                    }
-                }
+        val disposable = ApiFactory.apiService.getUser(login)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { result ->
+                callback.invoke(
+                    mapper.mapDtoToEntity(result)
+                )
             }
-
-            override fun onFailure(call: Call<UserEntityDto>, t: Throwable) {
-                throw RuntimeException("Server error")
-            }
-
-        })
+        compositeDisposable.add(disposable)
     }
 }

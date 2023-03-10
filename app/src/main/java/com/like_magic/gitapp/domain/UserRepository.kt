@@ -4,7 +4,7 @@ import com.like_magic.gitapp.domain.entity.UserEntity
 
 interface UserRepository {
 
-    fun loadData(callback:(List<UserEntity>) -> Unit)
+    fun loadData(callback: (List<UserEntity>) -> Unit)
 
     fun getUser(login:String, callback: (UserEntity) -> Unit)
 
