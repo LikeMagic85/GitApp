@@ -8,4 +8,10 @@ class Mapper {
     fun mapDtoToEntity(userEntityDto: UserEntityDto) =
         UserEntity(userEntityDto.login, userEntityDto.id, userEntityDto.avatarUrl)
 
+    fun mapListDtoToListEntity(list: List<UserEntityDto>) =
+        list.map {
+            mapDtoToEntity(it)
+        }
+
+
 }
