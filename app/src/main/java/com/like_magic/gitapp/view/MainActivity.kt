@@ -6,7 +6,7 @@ import com.like_magic.gitapp.R
 import com.like_magic.gitapp.databinding.ActivityMainBinding
 import com.like_magic.gitapp.domain.entity.UserEntity
 
-class MainActivity : AppCompatActivity(), UsersContract.View {
+class MainActivity : AppCompatActivity(), UsersContract.MainView {
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)

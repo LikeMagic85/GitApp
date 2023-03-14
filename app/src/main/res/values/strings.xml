@@ -4,4 +4,9 @@
     <string name="user_id_label">USER ID: </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="users_repos">Users Repos</string>
+    <string name="repo_title">Repo</string>
+    <string name="id_repo_label">ID</string>
+    <string name="name_label">Name</string>
+    <string name="forks_count_label">Forks count</string>
 </resources>

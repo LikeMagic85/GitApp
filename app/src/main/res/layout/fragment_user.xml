@@ -6,8 +6,7 @@
     android:orientation="vertical"
     android:clickable="true"
     android:focusable="true"
-    android:background="@color/white"
-    tools:context=".view.UserFragment">
+    android:background="@color/white">
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -54,5 +53,12 @@
             tools:text="0001"/>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/users_repo_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/users_repos"/>
 
 </LinearLayout>
