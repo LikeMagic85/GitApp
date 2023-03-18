@@ -10,7 +10,7 @@ import com.squareup.picasso.Picasso
 
 class UserListAdapter:ListAdapter<UserEntity, UserViewHolder>(UserDiffCallback()) {
 
-
+    var clickListener: ((UserEntity) -> Unit)? = null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val binding = ItemUserBinding.inflate(
             LayoutInflater.from(parent.context),
@@ -27,6 +27,9 @@ class UserListAdapter:ListAdapter<UserEntity, UserViewHolder>(UserDiffCallback()
                 userLoginValue.text = user.login
                 Picasso.get().load(user.avatarUrl).into(userAvatar)
                 userIdValue.text = user.id.toString()
+                root.setOnClickListener {
+                    clickListener?.invoke(user)
+                }
             }
         }
     }

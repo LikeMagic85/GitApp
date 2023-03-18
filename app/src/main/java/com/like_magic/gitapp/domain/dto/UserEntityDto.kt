@@ -11,5 +11,7 @@ data class UserEntityDto(
     @SerializedName("login")
     val login: String,
     @SerializedName("avatar_url")
-    val avatarUrl: String
+    val avatarUrl: String,
+    @SerializedName("repos_url")
+    val reposUrl: String
 )
