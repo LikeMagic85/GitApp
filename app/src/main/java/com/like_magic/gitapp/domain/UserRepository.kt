@@ -2,15 +2,15 @@ package com.like_magic.gitapp.domain
 
 import com.like_magic.gitapp.domain.entity.UserEntity
 import com.like_magic.gitapp.domain.entity.UserRepoEntity
+import io.reactivex.Single
 
 interface UserRepository {
 
-    fun loadData(callback: (List<UserEntity>) -> Unit)
+    fun loadData(): Single<List<UserEntity>>
 
-    fun getUser(login:String, callback: (UserEntity) -> Unit)
+    fun getUser(login: String): Single<UserEntity>
+    fun getUsersRepoList(url: String):Single<List<UserRepoEntity>>
 
-    fun getUsersRepoList(url:String, callback: (List<UserRepoEntity>) -> Unit)
-
-    fun getUsersRepo(url:String, callback: (UserRepoEntity) -> Unit)
+    fun getUsersRepo(url: String):Single<UserRepoEntity>
 
 }

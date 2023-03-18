@@ -2,6 +2,7 @@ package com.like_magic.gitapp.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import com.like_magic.gitapp.R
 import com.like_magic.gitapp.databinding.ActivityMainBinding
 import com.like_magic.gitapp.domain.entity.UserEntity
@@ -13,7 +14,9 @@ class MainActivity : AppCompatActivity(), UsersContract.MainView {
     }
     private val userAdapter = UserListAdapter()
 
-    private val presenter = Presenter()
+    private val presenter by lazy {
+        Presenter(application)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +49,10 @@ class MainActivity : AppCompatActivity(), UsersContract.MainView {
             .replace(R.id.main_container, UserFragment.newInstance(userEntity))
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun showError(message: String) {
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
     override fun showUsers(list: List<UserEntity>) {

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.google.android.material.snackbar.Snackbar
 import com.like_magic.gitapp.R
 import com.like_magic.gitapp.databinding.FragmentUserBinding
 import com.like_magic.gitapp.domain.entity.UserEntity
@@ -19,12 +20,19 @@ class UserFragment : Fragment(), UsersContract.UserFragmentView {
     private var _binding: FragmentUserBinding? = null
     private val binding:FragmentUserBinding
     get() = _binding ?: throw RuntimeException("FragmentUserBinding is null")
-    private var presenter =  Presenter()
+    private lateinit var presenter:Presenter
 
     lateinit var user:UserEntity
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        presenter = Presenter(requireActivity().application)
         presenter.attach(this)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        presenter.detach()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +72,10 @@ class UserFragment : Fragment(), UsersContract.UserFragmentView {
             .commit()
     }
 
+    override fun showSnackBar() {
+        Snackbar.make(binding.root, MESSAGE, Snackbar.LENGTH_SHORT).show()
+    }
+
     private fun parseArgs(): UserEntity {
         @Suppress("DEPRECATION") val args = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             arguments?.getParcelable(USER, UserEntity::class.java)
@@ -76,6 +88,7 @@ class UserFragment : Fragment(), UsersContract.UserFragmentView {
     companion object {
 
         private const val USER = "user"
+        private const val MESSAGE = "Network is unavailable"
 
         fun newInstance(userEntity: UserEntity) =
             UserFragment().apply {

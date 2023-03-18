@@ -1,16 +1,18 @@
 package com.like_magic.gitapp.domain.usecases
 
 import com.like_magic.gitapp.domain.UserRepository
-import com.like_magic.gitapp.domain.entity.UserRepoEntity
+import io.reactivex.Single
 
 class GetUsersReposListUseCase(private val repository: UserRepository) {
 
-    operator fun invoke(url: String, callback: (List<UserRepoEntity>) -> Unit){
+    operator fun invoke(url: String) =
 
-        repository.getUsersRepoList(url){
-            callback.invoke(it)
+        repository.getUsersRepoList(url).flatMap {
+            Single.fromCallable {
+                it
+            }
         }
 
-    }
+
 
 }

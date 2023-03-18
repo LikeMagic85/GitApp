@@ -1,14 +1,16 @@
 package com.like_magic.gitapp.domain.usecases
 
 import com.like_magic.gitapp.data.UserRepositoryImpl
-import com.like_magic.gitapp.domain.entity.UserEntity
+import io.reactivex.Single
 
-class GetUserUseCase(private val repository: UserRepositoryImpl) {
+class GetUserUseCase(
+    private val repository: UserRepositoryImpl
+) {
 
-    operator fun invoke(login:String, callback: (UserEntity) -> Unit) {
-        repository.getUser(login) {
-            callback.invoke(it)
+    operator fun invoke(login: String) =
+        repository.getUser(login).flatMap {
+            Single.fromCallable {
+                it
+            }
         }
-    }
-
 }

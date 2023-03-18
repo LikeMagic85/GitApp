@@ -1,72 +1,90 @@
 package com.like_magic.gitapp.data
 
-import android.util.Log
+import android.app.Application
+import com.like_magic.gitapp.data.database.AppDatabase
 import com.like_magic.gitapp.domain.UserRepository
 import com.like_magic.gitapp.data.network.ApiFactory
-import com.like_magic.gitapp.domain.entity.UserEntity
 import com.like_magic.gitapp.domain.entity.UserRepoEntity
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
 
-class UserRepositoryImpl : UserRepository {
+class UserRepositoryImpl(application: Application, private val networkStatus: INetworkStatus) : UserRepository {
 
     private val mapper = Mapper()
-    private val compositeDisposable = CompositeDisposable()
+    private val database = AppDatabase.getInstance(application).usersDao()
 
-    override fun loadData(callback: (List<UserEntity>) -> Unit) {
-        val disposable = ApiFactory.apiService.getUserList()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map{
-                mapper.mapListDtoToListEntity(it)
+    override fun loadData() =
+        networkStatus.isOnlineSingle().flatMap { isOnline ->
+            if (isOnline) {
+                ApiFactory.apiService.getUserList()
+                    .flatMap { users ->
+                        Single.fromCallable {
+                            val roomUsers = mapper.mapListEntityDtoToListDbModel(users)
+                            database.insertListOfUsers(roomUsers)
+                            mapper.mapListDtoToListEntity(users)
+                        }
+                    }
+            } else {
+                Single.fromCallable {
+                   database.getAllUser().map {
+                       mapper.mapDbModelToUserEntity(it)
+                   }
+                }
             }
-            .subscribe ({
-                callback.invoke(
-                    it
-                )
-            },{
-                Log.d("TEST_OF_LOADING_DATA", "Failure: ${it.message}")
-            })
-        compositeDisposable.add(disposable)
-    }
+        }.subscribeOn(Schedulers.io())
 
-    override fun getUser(login: String, callback: (UserEntity) -> Unit) {
-        val disposable = ApiFactory.apiService.getUser(login)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result ->
-                callback.invoke(
-                    mapper.mapDtoToEntity(result)
-                )
-            }
-        compositeDisposable.add(disposable)
-    }
 
-    override fun getUsersRepoList(url: String, callback: (List<UserRepoEntity>) -> Unit) {
-        val disposable = ApiFactory.apiService.getUsersReposList(url)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                mapper.mapListRepoDtoToListRepoEntity(it)
+    override fun getUser(login: String)  =
+        networkStatus.isOnlineSingle().flatMap {isOnline->
+            if (isOnline){
+                ApiFactory.apiService.getUser(login)
+                    .flatMap { user->
+                        Single.fromCallable {
+                            mapper.mapDtoToEntity(user)
+                        }
+                    }
+            }else{
+                Single.fromCallable{
+                    mapper.mapDbModelToUserEntity(database.getUser(login))
+                }
             }
-            .subscribe{result ->
-                callback.invoke(result)
-            }
-        compositeDisposable.add(disposable)
-    }
+        }.subscribeOn(Schedulers.io())
 
-    override fun getUsersRepo(url: String, callback: (UserRepoEntity) -> Unit) {
-        val disposable = ApiFactory.apiService.getUsersRepo(url)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .map {
-                mapper.mapRepoDtoToEntity(it)
+    override fun getUsersRepoList(url: String) =
+        networkStatus.isOnlineSingle().flatMap { isOnline ->
+            if (isOnline) {
+                ApiFactory.apiService.getUsersReposList(url)
+                    .flatMap {listRepos ->
+                        Single.fromCallable {
+                            listRepos.map{
+                                mapper.mapRepoDtoToEntity(it)
+                            }
+                        }
+                    }
+            } else {
+                Single.fromCallable{
+                    listOf()
+                }
             }
-            .subscribe{result ->
-                callback.invoke(result)
+        }.subscribeOn(Schedulers.io())
+
+
+
+    override fun getUsersRepo(url: String) =
+        networkStatus.isOnlineSingle().flatMap { isOnline ->
+            if (isOnline) {
+                ApiFactory.apiService.getUsersRepo(url)
+                    .flatMap {repo ->
+                        Single.fromCallable {
+                            mapper.mapRepoDtoToEntity(repo)
+                        }
+                    }
+            } else {
+                Single.fromCallable{
+                    UserRepoEntity(0, "", 0, "")
+                }
             }
-        compositeDisposable.add(disposable)
-    }
+        }.subscribeOn(Schedulers.io())
+
 }

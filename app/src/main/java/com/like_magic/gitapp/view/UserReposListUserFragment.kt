@@ -19,19 +19,26 @@ class UserReposListUserFragment : Fragment(), UsersContract.UsersRepoFragmentVie
     private var _binding: FragmentUserReposListBinding? = null
     private val binding:FragmentUserReposListBinding
     get() = _binding ?: throw RuntimeException("FragmentUserReposListBinding is null")
-    lateinit var list:List<UserRepoEntity>
+    lateinit var listRepos:List<UserRepoEntity>
     private val repoAdapter = RepoListAdapter()
-    private var presenter =  Presenter()
+    private lateinit var presenter:Presenter
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        presenter = Presenter(requireActivity().application)
         presenter.attach(this)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        presenter.detach()
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        list = parseArgs()
+        listRepos = parseArgs()
     }
 
     override fun onCreateView(
@@ -52,7 +59,7 @@ class UserReposListUserFragment : Fragment(), UsersContract.UsersRepoFragmentVie
 
     private fun initList(){
         binding.repoRv.adapter = repoAdapter
-        repoAdapter.submitList(list)
+        repoAdapter.submitList(listRepos)
     }
 
 
