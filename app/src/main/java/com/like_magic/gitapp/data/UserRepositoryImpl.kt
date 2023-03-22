@@ -1,18 +1,19 @@
 package com.like_magic.gitapp.data
 
-import android.app.Application
-import com.like_magic.gitapp.data.database.AppDatabase
-import com.like_magic.gitapp.domain.UserRepository
+import com.like_magic.gitapp.data.database.UsersDao
 import com.like_magic.gitapp.data.network.ApiFactory
+import com.like_magic.gitapp.domain.UserRepository
 import com.like_magic.gitapp.domain.entity.UserRepoEntity
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 
-class UserRepositoryImpl(application: Application, private val networkStatus: INetworkStatus) : UserRepository {
-
-    private val mapper = Mapper()
-    private val database = AppDatabase.getInstance(application).usersDao()
+class UserRepositoryImpl @Inject constructor(
+    private val networkStatus: INetworkStatus,
+    private val mapper:Mapper,
+    private val database: UsersDao
+    ) : UserRepository {
 
     override fun loadData() =
         networkStatus.isOnlineSingle().flatMap { isOnline ->

@@ -1,5 +1,6 @@
 package com.like_magic.gitapp.data
 
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -7,14 +8,15 @@ import android.net.NetworkRequest
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
+import javax.inject.Inject
 
-class AndroidNetworkStatus(context: Context) : INetworkStatus {
+class AndroidNetworkStatus @Inject constructor(application: Application) : INetworkStatus {
     private val statusSubject: BehaviorSubject<Boolean> =
         BehaviorSubject.create()
     init {
         statusSubject.onNext(false)
         val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val request = NetworkRequest.Builder().build()
         connectivityManager.registerNetworkCallback(request, object :
             ConnectivityManager.NetworkCallback() {

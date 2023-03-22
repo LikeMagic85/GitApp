@@ -8,11 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
+import com.like_magic.gitapp.GitApp
 import com.like_magic.gitapp.R
 import com.like_magic.gitapp.databinding.FragmentUserBinding
 import com.like_magic.gitapp.domain.entity.UserEntity
 import com.like_magic.gitapp.domain.entity.UserRepoEntity
 import com.squareup.picasso.Picasso
+import javax.inject.Inject
 
 
 class UserFragment : Fragment(), UsersContract.UserFragmentView {
@@ -20,12 +22,16 @@ class UserFragment : Fragment(), UsersContract.UserFragmentView {
     private var _binding: FragmentUserBinding? = null
     private val binding:FragmentUserBinding
     get() = _binding ?: throw RuntimeException("FragmentUserBinding is null")
-    private lateinit var presenter:Presenter
+    @Inject
+    lateinit var presenter:Presenter
+    private val component by lazy {
+        (requireActivity().application as GitApp).component
+    }
 
     lateinit var user:UserEntity
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        presenter = Presenter(requireActivity().application)
+        component.inject(this)
         presenter.attach(this)
     }
 
@@ -68,7 +74,7 @@ class UserFragment : Fragment(), UsersContract.UserFragmentView {
         requireActivity().supportFragmentManager
             .beginTransaction()
             .addToBackStack(null)
-            .replace(R.id.main_container, UserReposListUserFragment.newInstance(list))
+            .replace(R.id.main_container, UserReposListFragment.newInstance(list))
             .commit()
     }
 

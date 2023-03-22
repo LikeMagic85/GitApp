@@ -5,8 +5,9 @@ import com.like_magic.gitapp.domain.dto.UserEntityDto
 import com.like_magic.gitapp.domain.dto.UserRepoEntityDto
 import com.like_magic.gitapp.domain.entity.UserEntity
 import com.like_magic.gitapp.domain.entity.UserRepoEntity
+import javax.inject.Inject
 
-class Mapper {
+class Mapper @Inject constructor() {
 
     fun mapDtoToEntity(userEntityDto: UserEntityDto) =
         UserEntity(userEntityDto.login, userEntityDto.id, userEntityDto.avatarUrl, userEntityDto.reposUrl)

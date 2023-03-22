@@ -9,23 +9,29 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.like_magic.gitapp.GitApp
 import com.like_magic.gitapp.databinding.FragmentUserReposListBinding
 import com.like_magic.gitapp.databinding.RepoDialogBinding
 import com.like_magic.gitapp.domain.entity.UserRepoEntity
+import javax.inject.Inject
 
 
-class UserReposListUserFragment : Fragment(), UsersContract.UsersRepoFragmentView{
+class UserReposListFragment @Inject constructor() : Fragment(), UsersContract.UsersRepoFragmentView{
 
     private var _binding: FragmentUserReposListBinding? = null
     private val binding:FragmentUserReposListBinding
     get() = _binding ?: throw RuntimeException("FragmentUserReposListBinding is null")
     lateinit var listRepos:List<UserRepoEntity>
     private val repoAdapter = RepoListAdapter()
-    private lateinit var presenter:Presenter
+    @Inject
+    lateinit var presenter:Presenter
+    private val component by lazy {
+        (requireActivity().application as GitApp).component
+    }
 
     override fun onAttach(context: Context) {
+        component.inject(this)
         super.onAttach(context)
-        presenter = Presenter(requireActivity().application)
         presenter.attach(this)
     }
 
@@ -87,7 +93,7 @@ class UserReposListUserFragment : Fragment(), UsersContract.UsersRepoFragmentVie
         private const val LIST_REPO = "list repo"
 
         fun newInstance(list:List<UserRepoEntity>) =
-            UserReposListUserFragment().apply {
+            UserReposListFragment().apply {
                 arguments = Bundle().apply {
                     putParcelableArrayList(LIST_REPO, arrayListOf<Parcelable?>().apply {
                         addAll(list)
