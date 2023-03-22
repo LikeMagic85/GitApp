@@ -1,6 +1,7 @@
 package com.like_magic.gitapp.data.network
 
 import retrofit2.Retrofit
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiFactory {
@@ -10,6 +11,7 @@ object ApiFactory {
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(BASE_URL)
+        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build()
 
     val apiService: ApiService = retrofit.create(ApiService::class.java)
